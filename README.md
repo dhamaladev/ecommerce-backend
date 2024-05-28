@@ -4,7 +4,6 @@
 
 ### 1. Prerequisites
 
-- [ReactJs](https://react.dev/) - JavaScript library for building beautiful user interfaces
 - [Django](https://www.djangoproject.com/) - Python framework for full stack applications
 - [Postgres](https://www.postgresql.org/) - Relational database management system (RDBMS)
 - [DRF](https://www.django-rest-framework.org/) - Django rest framework for building web apis
@@ -14,8 +13,8 @@
 On the command prompt run the following commands:
 
 ``` 
- $ git clone https://github.com/dhamaladev/Ramailo-Ecommerce.git.git
- $ cd Ramailo-Ecommerce
+ $ git clone https://github.com/dhamaladev/ecommerce-backend.git
+ $ cd ecommerce-backend
  ```
  # For Backend
 ```

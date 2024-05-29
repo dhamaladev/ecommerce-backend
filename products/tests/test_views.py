@@ -1,86 +1,84 @@
-from rest_framework.test import APITestCase
-from rest_framework import status
 from django.urls import reverse
+from rest_framework import status
+from rest_framework.test import APITestCase
 from products.models import ProductModel
 from products.serializers import ProductSerializer
-from decimal import Decimal
 
-class ProductViewsTest(APITestCase):
 
+class ProductListCreateViewTest(APITestCase):
     def setUp(self):
         self.product_data = {
-            'title': 'Test Product',
-            'price': Decimal('99.99'),
-            'description': 'A product for testing.',
-            'category': 'Test Category',
-            'image': 'http://example.com/image.jpg',
-            'rating_rate': 4.5,
-            'rating_count': 10
+            "title": "Test Product",
+            "category": "Test Category",
+            "price": 9.99,
+            "description": "Test Description",
+            "image": "http://dhamala.com/image.jpg",
+            "rating_rate": 4.5,
+            "rating_count": 10,
         }
-        self.product = ProductModel.objects.create(**self.product_data)
-        self.product_url = reverse('product_detail', kwargs={'id': self.product.id})
-        self.product_list_url = reverse('all_products')
-        self.product_create_url = reverse('create_product')
-        self.product_search_url = reverse('product_search', kwargs={'title': self.product_data['title']})
-        self.product_category_url = reverse('product_category_filter', kwargs={'category': self.product_data['category']})
-        self.product_update_url = reverse('product_update', kwargs={'id': self.product.id})
-        self.product_delete_url = reverse('product_delete', kwargs={'id': self.product.id})
-
-    def test_get_all_products(self):
-        response = self.client.get(self.product_list_url)
-        products = ProductModel.objects.all()
-        serializer = ProductSerializer(products, many=True)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, serializer.data)
+        self.url = reverse("product_list_create")
 
     def test_create_product(self):
-        new_product_data = {
-            'title': 'New Product',
-            'price': '49.99',
-            'description': 'Another test product.',
-            'category': 'New Category',
-            'image': 'http://example.com/new_image.jpg',
-            'rating_rate': 4.0,
-            'rating_count': 5
-        }
-        response = self.client.post(self.product_create_url, new_product_data, format='json')
+        response = self.client.post(self.url, self.product_data, format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(ProductModel.objects.count(), 2)
-        self.assertEqual(ProductModel.objects.get(id=response.data['id']).title, new_product_data['title'])
+        self.assertEqual(ProductModel.objects.count(), 1)
+        self.assertEqual(ProductModel.objects.get().title, "Test Product")
 
-    def test_search_product_by_title(self):
-        response = self.client.get(self.product_search_url)
+    def test_list_products(self):
+        ProductModel.objects.create(**self.product_data)
+        response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
-        self.assertEqual(response.data[0]['title'], self.product_data['title'])
 
-    def test_get_product_detail(self):
-        response = self.client.get(self.product_url)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['title'], self.product_data['title'])
-
-    def test_filter_product_by_category(self):
-        response = self.client.get(self.product_category_url)
+    def test_filter_products_by_title(self):
+        ProductModel.objects.create(**self.product_data)
+        response = self.client.get(self.url, {"title": "Test Product"})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
-        self.assertEqual(response.data[0]['category'], self.product_data['category'])
+
+    def test_filter_products_by_category(self):
+        ProductModel.objects.create(**self.product_data)
+        response = self.client.get(self.url, {"category": "Test Category"})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+
+
+class ProductDetailUpdateDeleteViewTest(APITestCase):
+    def setUp(self):
+        self.product = ProductModel.objects.create(
+            title="Test Product",
+            category="Test Category",
+            price=9.99,
+            description="Test Description",
+            image="http://dhamala.com/image.jpg",
+            rating_rate=4.5,
+            rating_count=10,
+        )
+        self.url = reverse(
+            "product_detail_update_delete", kwargs={"id": self.product.id}
+        )
+
+    def test_retrieve_product(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["title"], self.product.title)
 
     def test_update_product(self):
-        updated_product_data = {
-            'title': 'Updated Product',
-            'price': '59.99',
-            'description': 'Updated test product.',
-            'category': 'Updated Category',
-            'image': 'http://example.com/updated_image.jpg',
-            'rating_rate': 4.8,
-            'rating_count': 20
+        updated_data = {
+            "title": "Updated Product",
+            "category": "Updated Category",
+            "price": 19.99,
+            "description": "Test Description Update",
+            "image": "http://dhamala.com/image.jpg",
+            "rating_rate": 3.5,
+            "rating_count": 12,
         }
-        response = self.client.put(self.product_update_url, updated_product_data, format='json')
+        response = self.client.put(self.url, updated_data, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        updated_product = ProductModel.objects.get(id=self.product.id)
-        self.assertEqual(updated_product.title, updated_product_data['title'])
+        self.product.refresh_from_db()
+        self.assertEqual(self.product.title, "Updated Product")
 
     def test_delete_product(self):
-        response = self.client.delete(self.product_delete_url)
+        response = self.client.delete(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(ProductModel.objects.count(), 0)

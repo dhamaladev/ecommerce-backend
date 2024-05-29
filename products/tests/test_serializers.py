@@ -11,7 +11,7 @@ class ProductSerializerTest(APITestCase):
             'price': Decimal('99.99'),
             'description': 'A product for testing.',
             'category': 'Test Category',
-            'image': 'http://example.com/image.jpg',
+            'image': 'http://dhamala.com/image.jpg',
             'rating_rate': 4.5,
             'rating_count': 10
         }
@@ -56,7 +56,7 @@ class ProductSerializerTest(APITestCase):
             'price': '49.99',
             'description': 'Another test product.',
             'category': 'New Category',
-            'image': 'http://example.com/new_image.jpg',
+            'image': 'http://dhamala.com/new_image.jpg',
             'rating_rate': 4.0,
             'rating_count': 5
         }

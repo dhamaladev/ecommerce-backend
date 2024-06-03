@@ -3,7 +3,8 @@ from products.models import ProductModel
 
 
 class ProductModelTest(TestCase):
-
+    """Product Model Testing"""
+    
     def test_create_product(self):
         product = ProductModel.objects.create(
             title="test title",

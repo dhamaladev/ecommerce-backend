@@ -4,7 +4,8 @@ from products.serializers import ProductSerializer
 from decimal import Decimal
 
 class ProductSerializerTest(APITestCase):
-
+    """Product Serializer Testing"""
+    
     def setUp(self):
         self.product_attributes = {
             'title': 'Test Product',

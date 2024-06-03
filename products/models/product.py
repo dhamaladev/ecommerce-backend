@@ -4,6 +4,8 @@ from django.core.validators import MinValueValidator, URLValidator
 
 # product model
 class ProductModel(models.Model):
+    """Model defining product attributes"""
+    
     title = models.CharField(max_length=255)
     price = models.DecimalField(
         max_digits=10, 

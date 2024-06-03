@@ -6,6 +6,8 @@ from products.serializers import ProductSerializer
 
 
 class ProductListCreateViewTest(APITestCase):
+    """Views Testing"""
+    
     def setUp(self):
         self.product_data = {
             "title": "Test Product",
